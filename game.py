@@ -4,8 +4,8 @@ import pygame
 
 
 WIDTH = 960
-HEIGHT = 750
-CELL = 30
+HEIGHT = 720
+CELL = 48
 pygame.init()
 running = True
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
