@@ -14,6 +14,9 @@ LIGHT = (60, 120, 80)
 DARK = (35, 75, 50)
 SNAKE_COLOR = (180, 255, 120)
 snake = [[5,5], [4,5], [3, 5]]
+direction = [1,0]
+move_delay = 150
+last_move_time = 0
 
 def draw_checkerboard():
     for col in range(WIDTH // CELL):
@@ -32,14 +35,31 @@ def draw_snake():
         y = part[1] * CELL
         pygame.draw.rect(screen, SNAKE_COLOR, (x, y, CELL, CELL))
         
-
-
+def move_snake():
+    head = snake[0]
+    new_head = [head[0] + direction[0], head[1] + direction[1]]
+    snake.insert(0, new_head)
+    snake.pop()
+        
 
 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP and direction != [0, 1]:
+                direction = [0, -1]
+            elif event.key == pygame.K_DOWN and direction != [0, -1]:
+                direction = [0, 1]
+            elif event.key == pygame.K_LEFT and direction != [1, 0]:
+                direction = [-1, 0]
+            elif event.key == pygame.K_RIGHT and direction != [-1, 0]:
+                direction = [1, 0]
+    current_time = pygame.time.get_ticks()
+    if current_time - last_move_time > move_delay:
+        move_snake()
+        last_move_time = current_time                 
     draw_checkerboard()
     draw_snake()
     pygame.display.flip()
