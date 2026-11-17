@@ -1,7 +1,6 @@
-import os
 import random
-import pygame
 
+import pygame
 
 WIDTH = 960
 HEIGHT = 720
@@ -14,6 +13,7 @@ clock = pygame.time.Clock()
 LIGHT = (60, 120, 80)
 DARK = (35, 75, 50)
 SNAKE_COLOR = (180, 255, 120)
+HEAD_COLOR = (0,0,0)
 snake = [[5,5], [4,5], [3, 5]]
 direction = [1,0]
 move_delay = 150
@@ -34,10 +34,15 @@ def draw_checkerboard():
             pygame.draw.rect(screen, color, (x, y, CELL, CELL))
 
 def draw_snake():
-    for part in snake:
+    for i in range(len(snake)):
+        part = snake[i]
         x = part[0] * CELL
         y = part[1] * CELL
-        pygame.draw.rect(screen, SNAKE_COLOR, (x, y, CELL, CELL))
+        if i == 0:
+            color = HEAD_COLOR
+        else:
+            color = SNAKE_COLOR
+        pygame.draw.rect(screen, color, (x, y, CELL, CELL))
         
 def draw_food():
     x = food[0] * CELL
