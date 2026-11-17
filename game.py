@@ -30,6 +30,11 @@ FOOD_COLORS =[
     (150, 32, 240)
 ]
 WALL_COLOR = (20, 40, 30)
+pillars = []
+while len(pillars) < 20:
+    p = [random.randint(1, 18), random.randint(1, 13)]
+    if p not in snake and p not in pillars:
+        pillars.append(p)
 
 def draw_checkerboard():
     for col in range(WIDTH // CELL):
@@ -69,15 +74,24 @@ def spawn_food():
 food = spawn_food()
 food_color = random.choice(FOOD_COLORS)
 
+def draw_pillars():
+    for p in pillars:
+        pygame.draw.rect(screen, (100, 100, 100), (p[0] * CELL, p[1] * CELL, CELL, CELL))
+    
+
 
 def move_snake():
     global food, game_over, direction, next_direction, food_color, score # noqa: PLW0602
     direction = next_direction
     head = snake[0]
     new_head = [head[0] + direction[0], head[1] + direction[1]]
-    if new_head[0] < 0 or new_head[0] >= 20 or new_head[1] < 0 or new_head[1] >= 15:
+    if new_head[0] < 0 or new_head[0] >= 20 or new_head[1] < 0 or new_head[1] >= 15:  # noqa: SIM102
         game_over = True
         return
+    for p in pillars:
+        if new_head == p:
+            game_over = True
+            return
     if new_head in snake:
         game_over = True
         return
@@ -113,6 +127,7 @@ while running:
     draw_checkerboard()
     draw_snake()
     draw_food()
+    draw_pillars()
     draw_wall()
     draw_score()
     pygame.display.flip()
