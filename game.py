@@ -76,7 +76,7 @@ def draw_wall():
 def spawn_food():
     while True:
         position = [random.randint(0, 19), random.randint(0, 14)]
-        if position not in snake:
+        if position not in snake and position not in pillars:
             return position
 food = spawn_food()
 food_color = random.choice(FOOD_COLORS)
