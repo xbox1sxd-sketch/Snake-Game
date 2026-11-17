@@ -8,6 +8,7 @@ HEIGHT = 720
 CELL = 48
 pygame.init()
 running = True
+game_over = False
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 LIGHT = (60, 120, 80)
@@ -19,6 +20,7 @@ move_delay = 150
 last_move_time = 0
 food = [15, 10]
 FOOD_COLOR =(255, 80, 80)
+WALL_COLOR = (20, 40, 30)
 
 def draw_checkerboard():
     for col in range(WIDTH // CELL):
@@ -42,12 +44,21 @@ def draw_food():
     y = food[1] * CELL
     pygame.draw.rect(screen, FOOD_COLOR, (x, y, CELL, CELL))
 
+def draw_wall():
+    pygame.draw.rect(screen, WALL_COLOR, (0, 0, WIDTH, HEIGHT), 12)
+
 
 
 def move_snake():
-    global food
+    global food, game_over
     head = snake[0]
     new_head = [head[0] + direction[0], head[1] + direction[1]]
+    if new_head[0] < 0 or new_head[0] >= 20 or new_head[1] < 0 or new_head[1] >= 15:
+        game_over = True
+        return
+    if new_head in snake:
+        game_over = True
+        return
     snake.insert(0, new_head)
     if new_head == food:
         food = [random.randint(0, 19), random.randint(0, 14)]
@@ -69,12 +80,13 @@ while running:
             elif event.key == pygame.K_RIGHT and direction != [-1, 0]:
                 direction = [1, 0]
     current_time = pygame.time.get_ticks()
-    if current_time - last_move_time > move_delay:
+    if not game_over and current_time - last_move_time > move_delay:
         move_snake()
         last_move_time = current_time                 
     draw_checkerboard()
     draw_snake()
     draw_food()
+    draw_wall()
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()
