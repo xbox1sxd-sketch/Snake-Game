@@ -19,7 +19,7 @@ direction = [1,0]
 next_direction = [1,0]
 move_delay = 200
 last_move_time = 0
-food = [15, 10]
+food = spawn_food()
 FOOD_COLOR =(255, 80, 80)
 WALL_COLOR = (20, 40, 30)
 
@@ -53,7 +53,11 @@ def draw_food():
 def draw_wall():
     pygame.draw.rect(screen, WALL_COLOR, (0, 0, WIDTH, HEIGHT), 12)
 
-
+def spawn_food():
+    while True:
+        position = [random.randint(0, 19), random.randint(0, 14)]
+        if position not in snake:
+            return position
 
 def move_snake():
     global food, game_over, direction, next_direction  # noqa: PLW0602
@@ -68,7 +72,7 @@ def move_snake():
         return
     snake.insert(0, new_head)
     if new_head == food:
-        food = [random.randint(0, 19), random.randint(0, 14)]
+        food = spawn_food()
     else:
         snake.pop()
         
