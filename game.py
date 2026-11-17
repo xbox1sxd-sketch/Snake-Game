@@ -16,6 +16,7 @@ SNAKE_COLOR = (180, 255, 120)
 HEAD_COLOR = (0,0,0)
 snake = [[5,5], [4,5], [3, 5]]
 direction = [1,0]
+next_direction = [1,0]
 move_delay = 150
 last_move_time = 0
 food = [15, 10]
@@ -55,7 +56,8 @@ def draw_wall():
 
 
 def move_snake():
-    global food, game_over
+    global food, game_over, direction, next_direction
+    direction = next_direction
     head = snake[0]
     new_head = [head[0] + direction[0], head[1] + direction[1]]
     if new_head[0] < 0 or new_head[0] >= 20 or new_head[1] < 0 or new_head[1] >= 15:
@@ -77,13 +79,13 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP and direction != [0, 1]:
-                direction = [0, -1]
+                next_direction = [0, -1]
             elif event.key == pygame.K_DOWN and direction != [0, -1]:
-                direction = [0, 1]
+                next_direction = [0, 1]
             elif event.key == pygame.K_LEFT and direction != [1, 0]:
-                direction = [-1, 0]
+                next_direction = [-1, 0]
             elif event.key == pygame.K_RIGHT and direction != [-1, 0]:
-                direction = [1, 0]
+                next_direction = [1, 0]
     current_time = pygame.time.get_ticks()
     if not game_over and current_time - last_move_time > move_delay:
         move_snake()
