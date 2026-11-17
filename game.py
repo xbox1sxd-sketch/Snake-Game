@@ -30,10 +30,17 @@ FOOD_COLORS =[
     (150, 32, 240)
 ]
 WALL_COLOR = (20, 40, 30)
+
 pillars = []
-while len(pillars) < 20:
+while len(pillars) < 15:
     p = [random.randint(1, 18), random.randint(1, 13)]
-    if p not in snake and p not in pillars:
+    if p[0] >= 3 and p[0] <= 10 and p[1] >= 3 and p[1] <= 7:
+        continue
+    too_close = False
+    for existing in pillars:
+        if abs(p[0] - existing[0]) <= 1 and abs(p[1] - existing[1]) <= 1:
+            too_close = True
+    if p not in snake and p not in pillars and not too_close:
         pillars.append(p)
 
 def draw_checkerboard():
