@@ -17,6 +17,8 @@ snake = [[5,5], [4,5], [3, 5]]
 direction = [1,0]
 move_delay = 150
 last_move_time = 0
+food = [15, 10]
+FOOD_COLOR =(255, 80, 80)
 
 def draw_checkerboard():
     for col in range(WIDTH // CELL):
@@ -35,13 +37,23 @@ def draw_snake():
         y = part[1] * CELL
         pygame.draw.rect(screen, SNAKE_COLOR, (x, y, CELL, CELL))
         
+def draw_food():
+    x = food[0] * CELL
+    y = food[1] * CELL
+    pygame.draw.rect(screen, FOOD_COLOR, (x, y, CELL, CELL))
+
+
+
 def move_snake():
+    global food
     head = snake[0]
     new_head = [head[0] + direction[0], head[1] + direction[1]]
     snake.insert(0, new_head)
-    snake.pop()
+    if new_head == food:
+        food = [random.randint(0, 19), random.randint(0, 14)]
+    else:
+        snake.pop()
         
-
 
 while running:
     for event in pygame.event.get():
@@ -62,6 +74,7 @@ while running:
         last_move_time = current_time                 
     draw_checkerboard()
     draw_snake()
+    draw_food()
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()
