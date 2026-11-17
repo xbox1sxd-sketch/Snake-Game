@@ -19,7 +19,6 @@ direction = [1,0]
 next_direction = [1,0]
 move_delay = 200
 last_move_time = 0
-food = spawn_food()
 FOOD_COLOR =(255, 80, 80)
 WALL_COLOR = (20, 40, 30)
 
@@ -58,6 +57,8 @@ def spawn_food():
         position = [random.randint(0, 19), random.randint(0, 14)]
         if position not in snake:
             return position
+food = spawn_food()
+
 
 def move_snake():
     global food, game_over, direction, next_direction  # noqa: PLW0602
