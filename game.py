@@ -28,6 +28,7 @@ move_delay = 140
 last_move_time = 0
 highscore = 0
 death_font = pygame.Font(None, 55)
+is_fullscreen = False
 
 oops_messages = [
     "oops",
@@ -198,6 +199,12 @@ while running:
                 in_menu = False
             if event.key == pygame.K_p and not in_menu and not game_over:
                 paused = not paused
+            if event.key == pygame.K_F11:
+                is_fullscreen = not is_fullscreen
+                if is_fullscreen:
+                    screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN, pygame.SCALED)
+                else:
+                    screen = pygame.display.set_mode((WIDTH, HEIGHT))
             if (event.key == pygame.K_r or event.key == pygame.K_RETURN or event.key == pygame.K_SPACE) and game_over:
                 game_over = False
                 snake = [[5,5 ], [4, 5], [3, 5]]
