@@ -26,6 +26,37 @@ next_direction = [1,0]
 move_delay = 140
 last_move_time = 0
 highscore = 0
+death_font = pygame.Font(None, 100)
+
+oops_messages = [
+    "oops",
+    "You died",
+    ":(",
+    "???",
+    "Well that was silly",
+    "Defeat.",
+    "Try harder next time",
+    "Did you get that on camera?",
+    "What did you do that for!",
+    "You lived a good life",
+    "Silly goose! You're supposed to live!",
+    "WASTED"
+]
+
+insult_messages = [
+    "Have you tried dodging?",
+    "Now thats just humiliating",
+    "Thats all you can do? ;-;",
+    "Who writes these messages",
+    "Whelp",
+    "Better luck next time",
+    "You gave it your all",
+    "As hornet once said, 'Git Gud'",
+]
+death_title = ""
+death_insult = ""
+small_font = pygame.Font(None, 32)
+
 #godot so much better for colors
 FOOD_COLORS =[
     (255, 80, 80),
@@ -93,7 +124,7 @@ def draw_pillars():
 
 
 def move_snake():
-    global food, game_over, direction, next_direction, food_color, score, highscore # noqa: PLW0602
+    global food, game_over, direction, next_direction, food_color, score, highscore, death_title, death_insult  # noqa: PLW0602
     direction = next_direction
     head = snake[0]
     new_head = [head[0] + direction[0], head[1] + direction[1]]
@@ -102,6 +133,8 @@ def move_snake():
         if score > highscore:
             highscore = score
             save_highscore(highscore)
+        death_title = random.choice(oops_messages)
+        death_insult = random.choice(insult_messages)
         return
     for p in pillars:
         if new_head == p:
@@ -109,12 +142,17 @@ def move_snake():
             if score > highscore:
                 highscore = score
                 save_highscore(highscore)
+            death_title = random.choice(oops_messages)
+            death_insult = random.choice(insult_messages)           
             return
     if new_head in snake:
         game_over = True
         if score > highscore:
             highscore = score
             save_highscore(highscore)
+        death_title = random.choice(oops_messages)
+        death_insult = random.choice(insult_messages)       
+        
         return
     snake.insert(0, new_head)
     if new_head == food:
@@ -202,10 +240,12 @@ while running:
         screen.blit(text4, (420, 530))
     if game_over:
         pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
-        text = font.render("YOU DIED", True, (255, 80, 80))
-        text2 = font.render("Press ENTER to RESTART", True, (255, 255, 255))
-        screen.blit(text, (WIDTH // 2 - 60, HEIGHT // 2 - 20))
-        screen.blit(text2, (WIDTH // 2 - 160, HEIGHT // 2 + 20))
+        text = death_font.render(death_title, True, (255, 80, 80))
+        screen.blit(text, (WIDTH // 2 - 150, HEIGHT // 2 - 80))
+        text2 = font.render(death_insult, True, (255, 255, 255))
+        screen.blit(text2, (WIDTH // 2 - 150, HEIGHT // 2 + 10))
+        text3 = font.render("Press ENTER to restart", True, (150, 150, 150))
+        screen.blit(text3, (WIDTH // 2 - 155, HEIGHT // 2 + 80))
     if paused:
         pygame.draw.rect(screen, (20, 30, 50), (0, 0, WIDTH, HEIGHT))
         text = big_font.render("PAUSED", True, (255, 255, 255))
