@@ -4,8 +4,9 @@ import random
 import pygame
 
 score = 0
-WIDTH = 960
-HEIGHT = 720
+OFFSET = 12
+WIDTH = 960 + OFFSET * 2
+HEIGHT = 720 + OFFSET * 2
 CELL = 48
 pygame.init()
 running = True
@@ -82,8 +83,8 @@ while len(pillars) < 9:
 def draw_checkerboard():
     for col in range(WIDTH // CELL):
         for row in range(HEIGHT // CELL):
-            x = col * CELL
-            y = row * CELL
+            x = col * CELL + OFFSET
+            y = row * CELL + OFFSET
             if (col + row) % 2 == 0:
                 color = LIGHT
             else:
@@ -93,8 +94,8 @@ def draw_checkerboard():
 def draw_snake():
     for i in range(len(snake)):
         part = snake[i]
-        x = part[0] * CELL
-        y = part[1] * CELL
+        x = part[0] * CELL + OFFSET
+        y = part[1] * CELL + OFFSET
         if i == 0:
             color = HEAD_COLOR
         else:
@@ -102,8 +103,8 @@ def draw_snake():
         pygame.draw.rect(screen, color, (x, y, CELL, CELL))
         
 def draw_food():
-    x = food[0] * CELL
-    y = food[1] * CELL
+    x = food[0] * CELL + OFFSET
+    y = food[1] * CELL + OFFSET
     pygame.draw.rect(screen, food_color, (x, y, CELL, CELL))
 
 def draw_wall():
@@ -119,7 +120,7 @@ food_color = random.choice(FOOD_COLORS)
 
 def draw_pillars():
     for p in pillars:
-        pygame.draw.rect(screen, (100, 100, 100), (p[0] * CELL, p[1] * CELL, CELL, CELL))
+        pygame.draw.rect(screen, (100, 100, 100), (p[0] * CELL + OFFSET, p[1] * CELL + OFFSET, CELL, CELL))
     
 
 
@@ -164,9 +165,9 @@ def move_snake():
 
 def draw_score():
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
-    screen.blit(score_text, (20, 15)) #used ai for just this line
+    screen.blit(score_text, (20 + OFFSET, 15 + OFFSET)) #used ai for just this line
     hs_text = font.render(f"High Score: {highscore}", True, (255, 215, 0))
-    screen.blit(hs_text, (WIDTH - 250, 15))
+    screen.blit(hs_text, (WIDTH - 250 - OFFSET, 15 + OFFSET))
 
 def load_highscore():
     if os.path.exists("highscore.txt"):
