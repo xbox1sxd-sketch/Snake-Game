@@ -8,6 +8,8 @@ HEIGHT = 720
 CELL = 48
 pygame.init()
 running = True
+in_menu = True
+big_font = pygame.Font(None, 100)
 game_over = False
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
@@ -127,6 +129,8 @@ while running:
                 next_direction = [-1, 0]
             elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and next_direction != [-1, 0]:
                 next_direction = [1, 0]
+            if event.key == pygame.K_SPACE and in_menu:
+                in_menu = False
             if (event.key == pygame.K_r or event.key == pygame.K_RETURN) and game_over:
                 game_over = False
                 snake = [[5,5 ], [4, 5], [3, 5]]
@@ -148,7 +152,7 @@ while running:
                 food = spawn_food()
                 food_color = random.choice(FOOD_COLORS)
     current_time = pygame.time.get_ticks()
-    if not game_over and current_time - last_move_time > move_delay:
+    if not in_menu and not game_over and current_time - last_move_time > move_delay:
         move_snake()
         last_move_time = current_time                 
     draw_checkerboard()
@@ -157,6 +161,11 @@ while running:
     draw_pillars()
     draw_wall()
     draw_score()
+    if in_menu:
+        text = big_font.render("SNAKE GAME", True, (255, 255, 255))
+        screen.blit(text, (280, 250))
+        text2 = font.render("Press SPACE to start", True, (255, 255, 0))
+        screen.blit(text2, (370, 400))
     if game_over:
         text = font.render("YOU DIED", True, (255, 80, 80))
         screen.blit(text, (WIDTH // 2 - 60, HEIGHT // 2 - 20))
