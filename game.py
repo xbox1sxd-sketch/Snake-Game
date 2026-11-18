@@ -92,7 +92,7 @@ def move_snake():
     direction = next_direction
     head = snake[0]
     new_head = [head[0] + direction[0], head[1] + direction[1]]
-    if new_head[0] < 0 or new_head[0] >= 20 or new_head[1] < 0 or new_head[1] >= 15:  # noqa: SIM102
+    if new_head[0] < 0 or new_head[0] >= 20 or new_head[1] < 0 or new_head[1] >= 15:
         game_over = True
         return
     for p in pillars:
@@ -127,6 +127,26 @@ while running:
                 next_direction = [-1, 0]
             elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and next_direction != [-1, 0]:
                 next_direction = [1, 0]
+            if (event.key == pygame.K_r or event.key == pygame.K_RETURN) and game_over:
+                game_over = False
+                snake = [[5,5 ], [4, 5], [3, 5]]
+                direction = [1,0]
+                next_direction = [1,0]
+                score = 0
+                last_move_time = pygame.time.get_ticks()
+                pillars = []
+                while len(pillars) < 15:
+                    p = [random.randint(1, 18), random.randint(1, 13)]
+                    if p[0] >= 3 and p[0] <= 10 and p[1] >= 3 and p[1] <= 7:
+                        continue
+                    too_close = False
+                    for existing in pillars:
+                        if abs(p[0] - existing[0]) <= 1 and abs (p[1] - existing[1]) <= 1:
+                            too_close = True
+                    if p not in snake and p not in pillars and not too_close:
+                        pillars.append(p)
+                food = spawn_food()
+                food_color = random.choice(FOOD_COLORS)
     current_time = pygame.time.get_ticks()
     if not game_over and current_time - last_move_time > move_delay:
         move_snake()
@@ -137,6 +157,9 @@ while running:
     draw_pillars()
     draw_wall()
     draw_score()
+    if game_over:
+        text = font.render("YOU DIED", True, (255, 80, 80))
+        screen.blit(text, (WIDTH // 2 - 60, HEIGHT // 2 - 20))
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()
