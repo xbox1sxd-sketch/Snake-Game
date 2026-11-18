@@ -162,13 +162,17 @@ while running:
     draw_wall()
     draw_score()
     if in_menu:
+        pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
         text = big_font.render("SNAKE GAME", True, (255, 255, 255))
         screen.blit(text, (280, 250))
         text2 = font.render("Press SPACE to start", True, (255, 255, 0))
         screen.blit(text2, (370, 400))
     if game_over:
+        pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
         text = font.render("YOU DIED", True, (255, 80, 80))
+        text2 = font.render("Press ENTER to RESTART", True, (255, 255, 255))
         screen.blit(text, (WIDTH // 2 - 60, HEIGHT // 2 - 20))
+        screen.blit(text2, (WIDTH // 2 - 160, HEIGHT // 2 + 20))
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()
