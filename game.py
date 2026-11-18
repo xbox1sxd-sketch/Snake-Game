@@ -11,6 +11,7 @@ running = True
 in_menu = True
 big_font = pygame.Font(None, 100)
 game_over = False
+paused = False
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 font = pygame.Font(None, 40)
@@ -131,6 +132,8 @@ while running:
                 next_direction = [1, 0]
             if event.key == pygame.K_SPACE and in_menu:
                 in_menu = False
+            if event.key == pygame.K_p and not in_menu and not game_over:
+                paused = not paused
             if (event.key == pygame.K_r or event.key == pygame.K_RETURN) and game_over:
                 game_over = False
                 snake = [[5,5 ], [4, 5], [3, 5]]
