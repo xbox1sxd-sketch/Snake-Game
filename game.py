@@ -26,7 +26,7 @@ next_direction = [1,0]
 move_delay = 140
 last_move_time = 0
 highscore = 0
-death_font = pygame.Font(None, 100)
+death_font = pygame.Font(None, 55)
 
 oops_messages = [
     "oops",
@@ -39,7 +39,7 @@ oops_messages = [
     "Did you get that on camera?",
     "What did you do that for!",
     "You lived a good life",
-    "Silly goose! You're supposed to live!",
+    "Silly goose!",
     "WASTED"
 ]
 
@@ -51,7 +51,7 @@ insult_messages = [
     "Whelp",
     "Better luck next time",
     "You gave it your all",
-    "As hornet once said, 'Git Gud'",
+    "Git Gud",
 ]
 death_title = ""
 death_insult = ""
@@ -68,7 +68,7 @@ FOOD_COLORS =[
 WALL_COLOR = (20, 40, 30)
 
 pillars = []
-while len(pillars) < 15:
+while len(pillars) < 9:
     p = [random.randint(1, 18), random.randint(1, 13)]
     if p[0] >= 3 and p[0] <= 10 and p[1] >= 3 and p[1] <= 7:
         continue
@@ -198,7 +198,7 @@ while running:
                 in_menu = False
             if event.key == pygame.K_p and not in_menu and not game_over:
                 paused = not paused
-            if (event.key == pygame.K_r or event.key == pygame.K_RETURN) and game_over:
+            if (event.key == pygame.K_r or event.key == pygame.K_RETURN or event.key == pygame.K_SPACE) and game_over:
                 game_over = False
                 snake = [[5,5 ], [4, 5], [3, 5]]
                 direction = [1,0]
