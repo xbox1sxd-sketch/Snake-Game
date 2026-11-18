@@ -1,3 +1,4 @@
+import os
 import random
 
 import pygame
@@ -24,6 +25,7 @@ direction = [1,0]
 next_direction = [1,0]
 move_delay = 140
 last_move_time = 0
+highscore = 0
 #godot so much better for colors
 FOOD_COLORS =[
     (255, 80, 80),
@@ -91,19 +93,28 @@ def draw_pillars():
 
 
 def move_snake():
-    global food, game_over, direction, next_direction, food_color, score # noqa: PLW0602
+    global food, game_over, direction, next_direction, food_color, score, highscore # noqa: PLW0602
     direction = next_direction
     head = snake[0]
     new_head = [head[0] + direction[0], head[1] + direction[1]]
     if new_head[0] < 0 or new_head[0] >= 20 or new_head[1] < 0 or new_head[1] >= 15:
         game_over = True
+        if score > highscore:
+            highscore = score
+            save_highscore(highscore)
         return
     for p in pillars:
         if new_head == p:
             game_over = True
+            if score > highscore:
+                highscore = score
+                save_highscore(highscore)
             return
     if new_head in snake:
         game_over = True
+        if score > highscore:
+            highscore = score
+            save_highscore(highscore)
         return
     snake.insert(0, new_head)
     if new_head == food:
@@ -116,6 +127,21 @@ def move_snake():
 def draw_score():
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
     screen.blit(score_text, (20, 15)) #used ai for just this line
+    hs_text = font.render(f"High Score: {highscore}", True, (255, 215, 0))
+    screen.blit(hs_text, (WIDTH - 250, 15))
+
+def load_highscore():
+    if os.path.exists("highscore.txt"):
+        with open("highscore.txt", "r") as f:
+            return int(f.read())
+    else:
+        return 0
+
+def save_highscore(hs):
+    with open("highscore.txt", "w") as f:
+        f.write(str(hs))
+        
+highscore = load_highscore()
 
 while running:
     for event in pygame.event.get():
