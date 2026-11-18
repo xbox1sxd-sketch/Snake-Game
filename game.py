@@ -155,7 +155,7 @@ while running:
                 food = spawn_food()
                 food_color = random.choice(FOOD_COLORS)
     current_time = pygame.time.get_ticks()
-    if not in_menu and not game_over and current_time - last_move_time > move_delay:
+    if not in_menu and not game_over and not paused and current_time - last_move_time > move_delay:
         move_snake()
         last_move_time = current_time                 
     draw_checkerboard()
@@ -176,6 +176,12 @@ while running:
         text2 = font.render("Press ENTER to RESTART", True, (255, 255, 255))
         screen.blit(text, (WIDTH // 2 - 60, HEIGHT // 2 - 20))
         screen.blit(text2, (WIDTH // 2 - 160, HEIGHT // 2 + 20))
+    if paused:
+        pygame.draw.rect(screen, (20, 30, 50), (0, 0, WIDTH, HEIGHT))
+        text = big_font.render("PAUSED", True, (255, 255, 255))
+        screen.blit(text, (WIDTH // 2 - 155, HEIGHT // 2 - 80))
+        text2 = font.render("Press P to resume", True, (150, 150, 150))
+        screen.blit(text2, (WIDTH // 2 - 130, HEIGHT // 2 + 30))
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()
