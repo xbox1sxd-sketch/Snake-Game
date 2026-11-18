@@ -71,11 +71,11 @@ WALL_COLOR = (20, 40, 30)
 pillars = []
 while len(pillars) < 9:
     p = [random.randint(1, 18), random.randint(1, 13)]
-    if p[0] >= 3 and p[0] <= 10 and p[1] >= 3 and p[1] <= 7:
+    if p[0] >= 2 and p[0] <= 8 and p[1] >= 3 and p[1] <= 7:
         continue
     too_close = False
     for existing in pillars:
-        if abs(p[0] - existing[0]) <= 1 and abs(p[1] - existing[1]) <= 1:
+        if abs(p[0] - existing[0]) <= 2 and abs(p[1] - existing[1]) <= 2:
             too_close = True
     if p not in snake and p not in pillars and not too_close:
         pillars.append(p)
@@ -112,7 +112,7 @@ def draw_wall():
 
 def spawn_food():
     while True:
-        position = [random.randint(0, 19), random.randint(0, 14)]
+        position = [random.randint(1, 18), random.randint(1, 13)]
         if position not in snake and position not in pillars:
             return position
 food = spawn_food()
@@ -122,7 +122,6 @@ def draw_pillars():
     for p in pillars:
         pygame.draw.rect(screen, (100, 100, 100), (p[0] * CELL + OFFSET, p[1] * CELL + OFFSET, CELL, CELL))
     
-
 
 def move_snake():
     global food, game_over, direction, next_direction, food_color, score, highscore, death_title, death_insult  # noqa: PLW0602
@@ -207,13 +206,13 @@ while running:
                 score = 0
                 last_move_time = pygame.time.get_ticks()
                 pillars = []
-                while len(pillars) < 15:
+                while len(pillars) < 9:
                     p = [random.randint(1, 18), random.randint(1, 13)]
-                    if p[0] >= 3 and p[0] <= 10 and p[1] >= 3 and p[1] <= 7:
+                    if p[0] >= 2 and p[0] <= 8 and p[1] >= 3 and p[1] <= 7:
                         continue
                     too_close = False
                     for existing in pillars:
-                        if abs(p[0] - existing[0]) <= 1 and abs (p[1] - existing[1]) <= 1:
+                        if abs(p[0] - existing[0]) <= 2 and abs (p[1] - existing[1]) <= 2:
                             too_close = True
                     if p not in snake and p not in pillars and not too_close:
                         pillars.append(p)
