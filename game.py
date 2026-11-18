@@ -14,7 +14,7 @@ in_menu = True
 big_font = pygame.Font(None, 100)
 game_over = False
 paused = False
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED)
 clock = pygame.time.Clock()
 font = pygame.Font(None, 40)
 LIGHT = (60, 120, 80)
@@ -24,11 +24,10 @@ HEAD_COLOR = (0,255,200)
 snake = [[5,5], [4,5], [3, 5]]
 direction = [1,0]
 next_direction = [1,0]
-move_delay = 140
+is_fullscreen = False
 last_move_time = 0
 highscore = 0
 death_font = pygame.Font(None, 55)
-is_fullscreen = False
 
 oops_messages = [
     "oops",
@@ -200,11 +199,8 @@ while running:
             if event.key == pygame.K_p and not in_menu and not game_over:
                 paused = not paused
             if event.key == pygame.K_F11:
+                pygame.display.toggle_fullscreen()
                 is_fullscreen = not is_fullscreen
-                if is_fullscreen:
-                    screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN, pygame.SCALED)
-                else:
-                    screen = pygame.display.set_mode((WIDTH, HEIGHT))
             if (event.key == pygame.K_r or event.key == pygame.K_RETURN or event.key == pygame.K_SPACE) and game_over:
                 game_over = False
                 snake = [[5,5 ], [4, 5], [3, 5]]
@@ -225,6 +221,10 @@ while running:
                         pillars.append(p)
                 food = spawn_food()
                 food_color = random.choice(FOOD_COLORS)
+    move_delay = 140 - (len(snake) * 2)
+    if is_fullscreen == True:
+        move_delay = move_delay - 30
+    move_delay = max(move_delay, 60)
     current_time = pygame.time.get_ticks()
     if not in_menu and not game_over and not paused and current_time - last_move_time > move_delay:
         move_snake()
@@ -245,6 +245,8 @@ while running:
         screen.blit(text3, (340, 480))
         text4 = font.render("P to pause", True, (150, 150, 150))
         screen.blit(text4, (420, 530))
+        text5 = font.render("F11 to Fullscreen", True, (150, 150, 150))
+        screen.blit(text5, (385, 580))
     if game_over:
         pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
         text = death_font.render(death_title, True, (255, 80, 80))
