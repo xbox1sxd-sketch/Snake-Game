@@ -170,6 +170,10 @@ while running:
         screen.blit(text, (280, 250))
         text2 = font.render("Press SPACE to start", True, (255, 255, 0))
         screen.blit(text2, (370, 400))
+        text3 = font.render("WASD or Arrow keys to move", True, (150, 150, 150))
+        screen.blit(text3, (340, 480))
+        text4 = font.render("P to pause", True, (150, 150, 150))
+        screen.blit(text4, (420, 530))
     if game_over:
         pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
         text = font.render("YOU DIED", True, (255, 80, 80))
