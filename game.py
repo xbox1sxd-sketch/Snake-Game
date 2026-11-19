@@ -10,6 +10,9 @@ HEIGHT = 720 + OFFSET * 2
 CELL = 48
 pygame.init()
 running = True
+difficulty = "Normal"
+base_speed = 140
+pillar_count = 9
 in_menu = True
 big_font = pygame.Font(None, 100)
 game_over = False
@@ -28,6 +31,7 @@ is_fullscreen = False
 last_move_time = 0
 highscore = 0
 death_font = pygame.Font(None, 55)
+highscores = []
 
 oops_messages = [
     "oops",
@@ -68,7 +72,7 @@ FOOD_COLORS =[
 WALL_COLOR = (20, 40, 30)
 
 pillars = []
-while len(pillars) < 9:
+while len(pillars) < pillar_count:
     p = [random.randint(1, 18), random.randint(1, 13)]
     if p[0] >= 2 and p[0] <= 8 and p[1] >= 3 and p[1] <= 7:
         continue
@@ -213,6 +217,19 @@ while running:
                     next_direction = [-1, 0]
                 elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and next_direction != [-1, 0]:
                     next_direction = [1, 0]
+            if in_menu:
+                if event.key == pygame.K_1:
+                    difficulty = "Easy"
+                    base_speed = 170
+                    pillar_count = 5
+                elif event.key == pygame.K_2:
+                    difficulty = "Normal"
+                    base_speed = 140
+                    pillar_count = 9
+                elif event.key == pygame.K_3:
+                    difficulty = "Hard"
+                    base_speed = 110
+                    pillar_count = 14
             if event.key == pygame.K_SPACE and in_menu:
                 in_menu = False
             if event.key == pygame.K_p and not in_menu and not game_over:
@@ -228,7 +245,7 @@ while running:
                 score = 0
                 last_move_time = pygame.time.get_ticks()
                 pillars = []
-                while len(pillars) < 9:
+                while len(pillars) < pillar_count:
                     p = [random.randint(1, 18), random.randint(1, 13)]
                     if p[0] >= 2 and p[0] <= 8 and p[1] >= 3 and p[1] <= 7:
                         continue
@@ -240,7 +257,7 @@ while running:
                         pillars.append(p)
                 food = spawn_food()
                 food_color = random.choice(FOOD_COLORS)
-    move_delay = 140 - (len(snake) * 2)
+    move_delay = base_speed - (len(snake) * 2)
     if is_fullscreen == True:
         move_delay = move_delay - 30
     move_delay = max(move_delay, 60)
@@ -266,6 +283,8 @@ while running:
         screen.blit(text4, (420, 530))
         text5 = font.render("F11 to Fullscreen", True, (150, 150, 150))
         screen.blit(text5, (385, 580))
+        text6 = font.render(f"Difficulty (1, 2, 3): {difficulty}", True, (255, 255, 255))
+        screen.blit(text6, (100, 700))
     if game_over:
         pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
         text = death_font.render(death_title, True, (255, 80, 80))
