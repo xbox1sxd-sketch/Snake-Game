@@ -186,14 +186,15 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if (event.key == pygame.K_UP or event.key == pygame.K_w) and next_direction != [0, 1]:
-                next_direction = [0, -1]
-            elif (event.key == pygame.K_DOWN or event.key == pygame.K_s) and next_direction != [0, -1]:
-                next_direction = [0, 1]
-            elif (event.key == pygame.K_LEFT or event.key == pygame.K_a) and next_direction != [1, 0]:
-                next_direction = [-1, 0]
-            elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and next_direction != [-1, 0]:
-                next_direction = [1, 0]
+            if not in_menu and not game_over and not paused:
+                if (event.key == pygame.K_UP or event.key == pygame.K_w) and next_direction != [0, 1]:
+                    next_direction = [0, -1]
+                elif (event.key == pygame.K_DOWN or event.key == pygame.K_s) and next_direction != [0, -1]:
+                    next_direction = [0, 1]
+                elif (event.key == pygame.K_LEFT or event.key == pygame.K_a) and next_direction != [1, 0]:
+                    next_direction = [-1, 0]
+                elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and next_direction != [-1, 0]:
+                    next_direction = [1, 0]
             if event.key == pygame.K_SPACE and in_menu:
                 in_menu = False
             if event.key == pygame.K_p and not in_menu and not game_over:
