@@ -56,7 +56,6 @@ insult_messages = [
 ]
 death_title = ""
 death_insult = ""
-small_font = pygame.Font(None, 32)
 
 #godot so much better for colors
 FOOD_COLORS =[
@@ -145,7 +144,7 @@ def move_snake():
             death_title = random.choice(oops_messages)
             death_insult = random.choice(insult_messages)           
             return
-    if new_head in snake:
+    if new_head in snake[:-1]:
         game_over = True
         if score > highscore:
             highscore = score
@@ -171,7 +170,10 @@ def draw_score():
 def load_highscore():
     if os.path.exists("highscore.txt"):
         with open("highscore.txt", "r") as f:
-            return int(f.read())
+            try:
+                return int(f.read())
+            except ValueError:
+                return 0
     else:
         return 0
 
@@ -227,7 +229,7 @@ while running:
         move_delay = move_delay - 30
     move_delay = max(move_delay, 60)
     current_time = pygame.time.get_ticks()
-    if not in_menu and not game_over and not paused and current_time - last_move_time > move_delay:
+    if not in_menu and not game_over and not paused and current_time - last_move_time >= move_delay:
         move_snake()
         last_move_time = current_time                 
     draw_checkerboard()
