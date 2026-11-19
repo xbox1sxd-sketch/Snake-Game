@@ -31,7 +31,7 @@ is_fullscreen = False
 last_move_time = 0
 highscore = 0
 death_font = pygame.Font(None, 55)
-highscores = []
+can_change_direction = True
 
 oops_messages = [
     "oops",
@@ -209,14 +209,18 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if not in_menu and not game_over and not paused:
-                if (event.key == pygame.K_UP or event.key == pygame.K_w) and next_direction != [0, 1]:
+                if (event.key == pygame.K_UP or event.key == pygame.K_w) and direction != [0, 1]  and can_change_direction:
                     next_direction = [0, -1]
-                elif (event.key == pygame.K_DOWN or event.key == pygame.K_s) and next_direction != [0, -1]:
+                    can_change_direction = False
+                elif (event.key == pygame.K_DOWN or event.key == pygame.K_s) and direction != [0, -1]  and can_change_direction:
                     next_direction = [0, 1]
-                elif (event.key == pygame.K_LEFT or event.key == pygame.K_a) and next_direction != [1, 0]:
+                    can_change_direction = False
+                elif (event.key == pygame.K_LEFT or event.key == pygame.K_a) and direction != [1, 0]  and can_change_direction:
                     next_direction = [-1, 0]
-                elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and next_direction != [-1, 0]:
+                    can_change_direction = False
+                elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and direction != [-1, 0]  and can_change_direction:
                     next_direction = [1, 0]
+                    can_change_direction = False
             if in_menu:
                 if event.key == pygame.K_1:
                     difficulty = "Easy"
@@ -232,8 +236,11 @@ while running:
                     pillar_count = 14
             if event.key == pygame.K_SPACE and in_menu:
                 in_menu = False
+                last_move_time = pygame.time.get_ticks()
+                can_change_direction = True
             if event.key == pygame.K_p and not in_menu and not game_over:
                 paused = not paused
+                last_move_time = pygame.time.get_ticks()
             if event.key == pygame.K_F11:
                 pygame.display.toggle_fullscreen()
                 is_fullscreen = not is_fullscreen
@@ -243,6 +250,8 @@ while running:
                 direction = [1,0]
                 next_direction = [1,0]
                 score = 0
+                can_change_direction = True
+                next_direction = [1, 0]
                 last_move_time = pygame.time.get_ticks()
                 pillars = []
                 while len(pillars) < pillar_count:
@@ -264,6 +273,7 @@ while running:
     current_time = pygame.time.get_ticks()
     if not in_menu and not game_over and not paused and current_time - last_move_time >= move_delay:
         move_snake()
+        can_change_direction = True
         last_move_time = current_time                 
     draw_checkerboard()
     draw_snake()
