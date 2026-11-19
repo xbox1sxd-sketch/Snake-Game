@@ -100,11 +100,27 @@ def draw_snake():
         else:
             color = SNAKE_COLOR
         pygame.draw.rect(screen, color, (x, y, CELL, CELL))
+        if i == 0:
+                if direction == [1, 0]:
+                    pygame.draw.circle(screen, (0, 0, 0), (x + 35, y + 14), 5)    
+                    pygame.draw.circle(screen, (0, 0, 0), (x + 35, y + 34), 5)
+                elif direction == [-1, 0]:
+                    pygame.draw.circle(screen, (0, 0, 0), (x + 13, y + 14), 5)
+                    pygame.draw.circle(screen, (0, 0, 0), (x + 13, y + 34), 5)
+                elif direction == [0, -1]:
+                    pygame.draw.circle(screen, (0, 0, 0), (x + 14, y + 13), 5)
+                    pygame.draw.circle(screen, (0, 0, 0), (x + 34, y + 13), 5)
+                elif direction == [0, 1]:
+                    pygame.draw.circle(screen, (0, 0, 0), (x + 14, y + 35), 5)
+                    pygame.draw.circle(screen, (0, 0, 0), (x + 34, y + 35), 5)
+                    
+                    
         
 def draw_food():
     x = food[0] * CELL + OFFSET
     y = food[1] * CELL + OFFSET
     pygame.draw.rect(screen, food_color, (x, y, CELL, CELL))
+            
 
 def draw_wall():
     pygame.draw.rect(screen, WALL_COLOR, (0, 0, WIDTH, HEIGHT), 12)
