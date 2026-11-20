@@ -63,7 +63,7 @@ death_insult = ""
 
 #godot so much better for colors
 FOOD_COLORS =[
-    (255, 80, 80),
+    (139, 0, 0),
     (255, 255, 0),
     (255, 165, 0),
     (0, 100, 255),
@@ -139,7 +139,7 @@ food_color = random.choice(FOOD_COLORS)
 
 def draw_pillars():
     for p in pillars:
-        pygame.draw.rect(screen, (100, 100, 100), (p[0] * CELL + OFFSET, p[1] * CELL + OFFSET, CELL, CELL))
+        pygame.draw.rect(screen, (200, 0, 0), (p[0] * CELL + OFFSET, p[1] * CELL + OFFSET, CELL, CELL))
     
 
 def move_snake():
