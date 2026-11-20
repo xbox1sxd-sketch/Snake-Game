@@ -76,6 +76,7 @@ FOOD_COLORS =[
 ]
 WALL_COLOR = (20, 40, 30)
 
+# Creates pillars (just black boxes) that if you run into you die
 def make_pillars():
     global pillars
     pillars = []
@@ -92,6 +93,7 @@ def make_pillars():
 
 make_pillars()
 
+# Draws the backround
 def draw_checkerboard():
     for col in range(WIDTH // CELL):
         for row in range(HEIGHT // CELL):
@@ -103,6 +105,7 @@ def draw_checkerboard():
                 color = DARK
             pygame.draw.rect(screen, color, (x, y, CELL, CELL))
 
+#Goes throught the snake list, if the first item is index 0 it draws the head cyan and draws the eyes.
 def draw_snake():
     for i in range(len(snake)):
         part = snake[i]
@@ -127,13 +130,13 @@ def draw_snake():
                 pygame.draw.circle(screen, (0, 0, 0), (x + 14, y + 35), 5)
                 pygame.draw.circle(screen, (0, 0, 0), (x + 34, y + 35), 5)
                     
-                    
-        
+#Draws a square with whatever is stored in food_color
 def draw_food():
     x = food[0] * CELL + OFFSET
     y = food[1] * CELL + OFFSET
     pygame.draw.rect(screen, food_color, (x, y, CELL, CELL))
-            
+       
+#If the ghost powerup is on the board it draws a square, and if the ghost timer is active it calculated how many seconds are left.     
 def draw_ghost():
     if ghost_pos[0] != -1:
         x = ghost_pos[0] * CELL + OFFSET
@@ -144,9 +147,11 @@ def draw_ghost():
         ghost_text = ghost_font.render(f"GHOST: {time_left}s", True, (200, 100, 255))
         screen.blit(ghost_text, (WIDTH - 250, 60))
 
+#Draws a border around the screen
 def draw_wall():
     pygame.draw.rect(screen, WALL_COLOR, (0, 0, WIDTH, HEIGHT), 12)
 
+#Finds a good place to spawn the food, using a while true loop to keep picking random grid spots
 def spawn_food():
     while True:
         position = [random.randint(1, 18), random.randint(1, 13)]
@@ -163,11 +168,12 @@ def spawn_food():
 food = spawn_food()
 food_color = random.choice(FOOD_COLORS)
 
+#Loops through the pillars list and draws a black square at each position
 def draw_pillars():
     for p in pillars:
         pygame.draw.rect(screen, (0, 0, 0), (p[0] * CELL + OFFSET, p[1] * CELL + OFFSET, CELL, CELL))
     
-
+#The biggest one, calculates where the head will be, if it hits something, if it eats something, and if we got a powerup
 def move_snake():
     global food, game_over, direction, next_direction, food_color, score, highscore, death_title, death_insult, ghost_pos, ghost_timer, ghost_spawn_time  # noqa: PLW0602
     direction = next_direction
@@ -217,12 +223,15 @@ def move_snake():
         ghost_pos = [-1, -1]
         ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
 
+# Draws the text in the top left and right. Also uses offset to make sure it doesnt hit the wall.
 def draw_score():
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
     screen.blit(score_text, (20 + OFFSET, 15 + OFFSET)) #used ai for just this line
     hs_text = font.render(f"High Score: {highscore}", True, (255, 215, 0))
     screen.blit(hs_text, (WIDTH - 250 - OFFSET, 15 + OFFSET))
 
+#If it finds highscore.txt if reads the number, and if there isnt a number it just returns zero
+#Used ai for this function
 def load_highscore():
     if os.path.exists("highscore.txt"):
         with open("highscore.txt", "r") as f:
@@ -233,12 +242,14 @@ def load_highscore():
     else:
         return 0
 
+#Opens the highscore file and writes the new number into it
 def save_highscore(hs):
     with open("highscore.txt", "w") as f:
         f.write(str(hs))
         
 highscore = load_highscore()
 
+#Controls everything, inputs, the backround, restarts, colors and more
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
