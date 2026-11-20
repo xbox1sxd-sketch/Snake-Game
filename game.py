@@ -63,7 +63,7 @@ death_insult = ""
 
 #godot so much better for colors
 FOOD_COLORS =[
-    (139, 0, 0),
+    (200, 0, 0),
     (255, 255, 0),
     (255, 165, 0),
     (0, 100, 255),
@@ -71,17 +71,21 @@ FOOD_COLORS =[
 ]
 WALL_COLOR = (20, 40, 30)
 
-pillars = []
-while len(pillars) < pillar_count:
-    p = [random.randint(1, 18), random.randint(1, 13)]
-    if p[0] >= 2 and p[0] <= 8 and p[1] >= 3 and p[1] <= 7:
-        continue
-    too_close = False
-    for existing in pillars:
-        if abs(p[0] - existing[0]) <= 2 and abs(p[1] - existing[1]) <= 2:
-            too_close = True
-    if p not in snake and p not in pillars and not too_close:
-        pillars.append(p)
+def make_pillars():
+    global pillars
+    pillars = []
+    while len(pillars) < pillar_count:
+        p = [random.randint(1, 18), random.randint(1, 13)]
+        if p[0] >= 2 and p[0] <= 8 and p[1] >= 3 and p[1] <= 7:
+            continue
+        too_close = False
+        for existing in pillars:
+            if abs(p[0] - existing[0]) <= 2 and abs(p[1] - existing[1]) <= 2:
+                too_close = True
+        if p not in snake and p not in pillars and not too_close:
+            pillars.append(p)
+
+make_pillars()
 
 def draw_checkerboard():
     for col in range(WIDTH // CELL):
@@ -105,18 +109,18 @@ def draw_snake():
             color = SNAKE_COLOR
         pygame.draw.rect(screen, color, (x, y, CELL, CELL))
         if i == 0:
-                if direction == [1, 0]:
-                    pygame.draw.circle(screen, (0, 0, 0), (x + 35, y + 14), 5)    
-                    pygame.draw.circle(screen, (0, 0, 0), (x + 35, y + 34), 5)
-                elif direction == [-1, 0]:
-                    pygame.draw.circle(screen, (0, 0, 0), (x + 13, y + 14), 5)
-                    pygame.draw.circle(screen, (0, 0, 0), (x + 13, y + 34), 5)
-                elif direction == [0, -1]:
-                    pygame.draw.circle(screen, (0, 0, 0), (x + 14, y + 13), 5)
-                    pygame.draw.circle(screen, (0, 0, 0), (x + 34, y + 13), 5)
-                elif direction == [0, 1]:
-                    pygame.draw.circle(screen, (0, 0, 0), (x + 14, y + 35), 5)
-                    pygame.draw.circle(screen, (0, 0, 0), (x + 34, y + 35), 5)
+            if direction == [1, 0]:
+                pygame.draw.circle(screen, (0, 0, 0), (x + 35, y + 14), 5)    
+                pygame.draw.circle(screen, (0, 0, 0), (x + 35, y + 34), 5)
+            elif direction == [-1, 0]:
+                pygame.draw.circle(screen, (0, 0, 0), (x + 13, y + 14), 5)
+                pygame.draw.circle(screen, (0, 0, 0), (x + 13, y + 34), 5)
+            elif direction == [0, -1]:
+                pygame.draw.circle(screen, (0, 0, 0), (x + 14, y + 13), 5)
+                pygame.draw.circle(screen, (0, 0, 0), (x + 34, y + 13), 5)
+            elif direction == [0, 1]:
+                pygame.draw.circle(screen, (0, 0, 0), (x + 14, y + 35), 5)
+                pygame.draw.circle(screen, (0, 0, 0), (x + 34, y + 35), 5)
                     
                     
         
@@ -238,6 +242,7 @@ while running:
                 in_menu = False
                 last_move_time = pygame.time.get_ticks()
                 can_change_direction = True
+                make_pillars()
             if event.key == pygame.K_p and not in_menu and not game_over:
                 paused = not paused
                 last_move_time = pygame.time.get_ticks()
@@ -253,17 +258,7 @@ while running:
                 can_change_direction = True
                 next_direction = [1, 0]
                 last_move_time = pygame.time.get_ticks()
-                pillars = []
-                while len(pillars) < pillar_count:
-                    p = [random.randint(1, 18), random.randint(1, 13)]
-                    if p[0] >= 2 and p[0] <= 8 and p[1] >= 3 and p[1] <= 7:
-                        continue
-                    too_close = False
-                    for existing in pillars:
-                        if abs(p[0] - existing[0]) <= 2 and abs (p[1] - existing[1]) <= 2:
-                            too_close = True
-                    if p not in snake and p not in pillars and not too_close:
-                        pillars.append(p)
+                make_pillars()
                 food = spawn_food()
                 food_color = random.choice(FOOD_COLORS)
     move_delay = base_speed - (len(snake) * 2)
