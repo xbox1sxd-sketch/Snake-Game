@@ -139,7 +139,7 @@ food_color = random.choice(FOOD_COLORS)
 
 def draw_pillars():
     for p in pillars:
-        pygame.draw.rect(screen, (200, 0, 0), (p[0] * CELL + OFFSET, p[1] * CELL + OFFSET, CELL, CELL))
+        pygame.draw.rect(screen, (0, 0, 0), (p[0] * CELL + OFFSET, p[1] * CELL + OFFSET, CELL, CELL))
     
 
 def move_snake():
