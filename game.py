@@ -23,8 +23,9 @@ font = pygame.Font(None, 40)
 LIGHT = (60, 120, 80)
 DARK = (35, 75, 50)
 SNAKE_COLOR = (180, 255, 120)
+tail_color = SNAKE_COLOR
 HEAD_COLOR = (0,255,200)
-snake = [[5,5], [4,5], [3, 5]]
+snake = [[5,5, SNAKE_COLOR], [4,5, SNAKE_COLOR], [3, 5, SNAKE_COLOR]]
 direction = [1,0]
 next_direction = [1,0]
 is_fullscreen = False
@@ -34,7 +35,7 @@ death_font = pygame.Font(None, 55)
 can_change_direction = True
 ghost_pos = [-1, -1]
 ghost_timer = 0
-ghost_spawn_time = pygame.time.get_ticks() + random.randint(30000, 50000)
+ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
 ghost_font = pygame.Font(None, 30)
 
 oops_messages = [
@@ -110,7 +111,7 @@ def draw_snake():
         if i == 0:
             color = HEAD_COLOR
         else:
-            color = SNAKE_COLOR
+            color = part[2]
         pygame.draw.rect(screen, color, (x, y, CELL, CELL))
         if i == 0:
             if direction == [1, 0]:
@@ -145,7 +146,15 @@ def draw_wall():
 def spawn_food():
     while True:
         position = [random.randint(1, 18), random.randint(1, 13)]
-        if position not in snake and position not in pillars:
+        in_pillar = False
+        for p in pillars:
+            if p[0] == position[0] and p[1] == position[1]:
+                in_pillar = True
+        in_snake = False
+        for s in snake:
+            if s[0] == position[0] and s[1] == position[1]:
+                in_snake = True
+        if in_pillar == False and in_snake == False:
             return position
 food = spawn_food()
 food_color = random.choice(FOOD_COLORS)
@@ -159,7 +168,7 @@ def move_snake():
     global food, game_over, direction, next_direction, food_color, score, highscore, death_title, death_insult, ghost_pos, ghost_timer, ghost_spawn_time  # noqa: PLW0602
     direction = next_direction
     head = snake[0]
-    new_head = [head[0] + direction[0], head[1] + direction[1]]
+    new_head = [head[0] + direction[0], head[1] + direction[1], SNAKE_COLOR]
     if new_head[0] < 0 or new_head[0] >= 20 or new_head[1] < 0 or new_head[1] >= 15:
         game_over = True
         if score > highscore:
@@ -169,7 +178,7 @@ def move_snake():
         death_insult = random.choice(insult_messages)
         return
     for p in pillars:
-        if new_head == p and pygame.time.get_ticks() > ghost_timer:
+        if new_head[0] == p[0] and new_head[1] == p[1] and pygame.time.get_ticks() >= ghost_timer:
             game_over = True
             if score > highscore:
                 highscore = score
@@ -177,7 +186,11 @@ def move_snake():
             death_title = random.choice(oops_messages)
             death_insult = random.choice(insult_messages)           
             return
-    if new_head in snake[:-1]:
+    hit_self = False
+    for s in snake[:-1]:
+        if s[0] == new_head[0] and s[1] == new_head[1]:
+            hit_self = True
+    if hit_self:
         game_over = True
         if score > highscore:
             highscore = score
@@ -186,17 +199,19 @@ def move_snake():
         death_insult = random.choice(insult_messages)       
         
         return
+    ate_food = new_head[:2] == food
     snake.insert(0, new_head)
-    if new_head == food:
+    if ate_food:
+        new_head[2] = food_color
         food = spawn_food()
         food_color = random.choice(FOOD_COLORS)
         score += 1
     else:
         snake.pop()
-    if new_head == ghost_pos:
+    if new_head[0] == ghost_pos[0] and new_head[1] == ghost_pos[1]:
         ghost_timer = pygame.time.get_ticks() + 5000
         ghost_pos = [-1, -1]
-        ghost_spawn_time = pygame.time.get_ticks() + random.randint(30000, 50000)
+        ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
 
 def draw_score():
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
@@ -264,7 +279,7 @@ while running:
                 is_fullscreen = not is_fullscreen
             if (event.key == pygame.K_r or event.key == pygame.K_RETURN or event.key == pygame.K_SPACE) and game_over:
                 game_over = False
-                snake = [[5,5 ], [4, 5], [3, 5]]
+                snake = [[5,5, SNAKE_COLOR ], [4, 5, SNAKE_COLOR], [3, 5, SNAKE_COLOR]]
                 direction = [1,0]
                 next_direction = [1,0]
                 score = 0
@@ -274,17 +289,27 @@ while running:
                 make_pillars()
                 ghost_pos = [-1, -1]
                 ghost_timer = 0
-                ghost_spawn_time = pygame.time.get_ticks() + random.randint(30000, 50000)
+                ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
                 food = spawn_food()
                 food_color = random.choice(FOOD_COLORS)
+                tail_color = SNAKE_COLOR
     move_delay = base_speed - (len(snake) * 2)
     if is_fullscreen == True:
         move_delay = move_delay - 15
     move_delay = max(move_delay, 60)
-    if ghost_pos[0] == -1 and pygame.time.get_ticks() > ghost_spawn_time:
-        ghost_pos = [random.randint(1, 18), random.randint(1, 13)]
-        while ghost_pos in pillars or ghost_pos in snake:
+    if ghost_pos[0] == -1 and pygame.time.get_ticks() > ghost_spawn_time and not in_menu and not game_over and not paused:
+        bad_spot = True
+        while bad_spot:
             ghost_pos = [random.randint(1, 18), random.randint(1, 13)]
+            bad_spot = False
+            if ghost_pos == food:
+                bad_spot = True
+            for s in snake:
+                if s[:2] == ghost_pos:
+                    bad_spot = True
+            for p in pillars:
+                if p == ghost_pos:
+                    bad_spot = True
     current_time = pygame.time.get_ticks()
     if not in_menu and not game_over and not paused and current_time - last_move_time >= move_delay:
         move_snake()
