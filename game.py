@@ -139,6 +139,10 @@ def draw_ghost():
         x = ghost_pos[0] * CELL + OFFSET
         y = ghost_pos[1] * CELL + OFFSET
         pygame.draw.rect(screen, (200, 100, 255), (x, y, CELL, CELL ))
+    if pygame.time.get_ticks() < ghost_timer:
+        time_left = int((ghost_timer - pygame.time.get_ticks()) /1000) + 1
+        ghost_text = ghost_font.render(f"GHOST: {time_left}s", True, (200, 100, 255))
+        screen.blit(ghost_text, (WIDTH - 250, 60))
 
 def draw_wall():
     pygame.draw.rect(screen, WALL_COLOR, (0, 0, WIDTH, HEIGHT), 12)
