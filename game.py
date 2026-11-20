@@ -32,8 +32,9 @@ last_move_time = 0
 highscore = 0
 death_font = pygame.Font(None, 55)
 can_change_direction = True
-ghost_pos = [2, 2]
+ghost_pos = [-1, -1]
 ghost_timer = 0
+ghost_spawn_time = pygame.time.get_ticks() + random.randint(30000, 50000)
 ghost_font = pygame.Font(None, 30)
 
 oops_messages = [
@@ -133,9 +134,10 @@ def draw_food():
     pygame.draw.rect(screen, food_color, (x, y, CELL, CELL))
             
 def draw_ghost():
-    x = ghost_pos[0] * CELL + OFFSET
-    y = ghost_pos[1] * CELL + OFFSET
-    pygame.draw.rect(screen, (200, 100, 255), (x, y, CELL, CELL ))
+    if ghost_pos[0] != -1:
+        x = ghost_pos[0] * CELL + OFFSET
+        y = ghost_pos[1] * CELL + OFFSET
+        pygame.draw.rect(screen, (200, 100, 255), (x, y, CELL, CELL ))
 
 def draw_wall():
     pygame.draw.rect(screen, WALL_COLOR, (0, 0, WIDTH, HEIGHT), 12)
@@ -154,7 +156,7 @@ def draw_pillars():
     
 
 def move_snake():
-    global food, game_over, direction, next_direction, food_color, score, highscore, death_title, death_insult, ghost_pos, ghost_timer  # noqa: PLW0602
+    global food, game_over, direction, next_direction, food_color, score, highscore, death_title, death_insult, ghost_pos, ghost_timer, ghost_spawn_time  # noqa: PLW0602
     direction = next_direction
     head = snake[0]
     new_head = [head[0] + direction[0], head[1] + direction[1]]
@@ -167,15 +169,14 @@ def move_snake():
         death_insult = random.choice(insult_messages)
         return
     for p in pillars:
-        if new_head == p:
-            if pygame.time.get_ticks() > ghost_timer:
-                game_over = True
-                if score > highscore:
-                    highscore = score
-                    save_highscore(highscore)
-                death_title = random.choice(oops_messages)
-                death_insult = random.choice(insult_messages)           
-                return
+        if new_head == p and pygame.time.get_ticks() > ghost_timer:
+            game_over = True
+            if score > highscore:
+                highscore = score
+                save_highscore(highscore)
+            death_title = random.choice(oops_messages)
+            death_insult = random.choice(insult_messages)           
+            return
     if new_head in snake[:-1]:
         game_over = True
         if score > highscore:
@@ -194,7 +195,8 @@ def move_snake():
         snake.pop()
     if new_head == ghost_pos:
         ghost_timer = pygame.time.get_ticks() + 5000
-        ghost_pos = [random.randint(1, 18), random.randint(1, 13)]
+        ghost_pos = [-1, -1]
+        ghost_spawn_time = pygame.time.get_ticks() + random.randint(30000, 50000)
 
 def draw_score():
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
@@ -270,14 +272,19 @@ while running:
                 next_direction = [1, 0]
                 last_move_time = pygame.time.get_ticks()
                 make_pillars()
-                ghost_pos = [random.randint(1, 18), random.randint(1, 13)]
+                ghost_pos = [-1, -1]
                 ghost_timer = 0
+                ghost_spawn_time = pygame.time.get_ticks() + random.randint(30000, 50000)
                 food = spawn_food()
                 food_color = random.choice(FOOD_COLORS)
     move_delay = base_speed - (len(snake) * 2)
     if is_fullscreen == True:
-        move_delay = move_delay - 30
+        move_delay = move_delay - 15
     move_delay = max(move_delay, 60)
+    if ghost_pos[0] == -1 and pygame.time.get_ticks() > ghost_spawn_time:
+        ghost_pos = [random.randint(1, 18), random.randint(1, 13)]
+        while ghost_pos in pillars or ghost_pos in snake:
+            ghost_pos = [random.randint(1, 18), random.randint(1, 13)]
     current_time = pygame.time.get_ticks()
     if not in_menu and not game_over and not paused and current_time - last_move_time >= move_delay:
         move_snake()
@@ -286,10 +293,10 @@ while running:
     draw_checkerboard()
     draw_snake()
     draw_food()
+    draw_ghost()
     draw_pillars()
     draw_wall()
     draw_score()
-    draw_ghost()
     if in_menu:
         pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
         text = big_font.render("SNAKE GAME", True, (255, 255, 255))
