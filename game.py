@@ -23,7 +23,6 @@ font = pygame.Font(None, 40)
 LIGHT = (60, 120, 80)
 DARK = (35, 75, 50)
 SNAKE_COLOR = (180, 255, 120)
-tail_color = SNAKE_COLOR
 HEAD_COLOR = (0,255,200)
 snake = [[5,5, SNAKE_COLOR], [4,5, SNAKE_COLOR], [3, 5, SNAKE_COLOR]]
 direction = [1,0]
@@ -37,6 +36,7 @@ ghost_pos = [-1, -1]
 ghost_timer = 0
 ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
 ghost_font = pygame.Font(None, 30)
+pause_start_time = 0
 
 oops_messages = [
     "oops",
@@ -88,7 +88,7 @@ def make_pillars():
         for existing in pillars:
             if abs(p[0] - existing[0]) <= 2 and abs(p[1] - existing[1]) <= 2:
                 too_close = True
-        if p not in snake and p not in pillars and not too_close:
+        if p not in [s[:2] for s in snake] and p not in pillars and not too_close:
             pillars.append(p)
 
 make_pillars()
@@ -163,7 +163,7 @@ def spawn_food():
         for s in snake:
             if s[0] == position[0] and s[1] == position[1]:
                 in_snake = True
-        if in_pillar == False and in_snake == False:
+        if in_pillar == False and in_snake == False and position != ghost_pos:
             return position
 food = spawn_food()
 food_color = random.choice(FOOD_COLORS)
@@ -286,9 +286,19 @@ while running:
                 last_move_time = pygame.time.get_ticks()
                 can_change_direction = True
                 make_pillars()
+                food = spawn_food()
+                food_color = random.choice(FOOD_COLORS)
             if event.key == pygame.K_p and not in_menu and not game_over:
-                paused = not paused
-                last_move_time = pygame.time.get_ticks()
+                if paused == False:
+                    paused = True
+                    pause_start_time = pygame.time.get_ticks()
+                else:
+                    paused = False
+                    pause_duration = pygame.time.get_ticks() - pause_start_time
+                    if ghost_timer > pause_start_time:
+                        ghost_timer = ghost_timer + pause_duration
+                    ghost_spawn_time = ghost_spawn_time + pause_duration
+                    last_move_time = pygame.time.get_ticks()
             if event.key == pygame.K_F11:
                 pygame.display.toggle_fullscreen()
                 is_fullscreen = not is_fullscreen
@@ -307,7 +317,6 @@ while running:
                 ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
                 food = spawn_food()
                 food_color = random.choice(FOOD_COLORS)
-                tail_color = SNAKE_COLOR
     move_delay = base_speed - (len(snake) * 2)
     if is_fullscreen == True:
         move_delay = move_delay - 15
