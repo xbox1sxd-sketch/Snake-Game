@@ -49,7 +49,8 @@ oops_messages = [
     "What did you do that for!",
     "You lived a good life",
     "Silly goose!",
-    "WASTED"
+    "WASTED",
+    "Cmon I gave ya powerups!"
 ]
 
 insult_messages = [
@@ -61,6 +62,7 @@ insult_messages = [
     "Better luck next time",
     "You gave it your all",
     "Git Gud",
+    "Get better"
 ]
 death_title = ""
 death_insult = ""
@@ -323,6 +325,11 @@ while running:
     move_delay = base_speed - (len(snake) * 2)
 
     move_delay = max(move_delay, 60)
+    current_time = pygame.time.get_ticks()
+    if not in_menu and not game_over and not paused and current_time - last_move_time >= move_delay:
+        move_snake()
+        can_change_direction = True
+        last_move_time = current_time
     if ghost_pos[0] == -1 and pygame.time.get_ticks() > ghost_spawn_time and not in_menu and not game_over and not paused:
         available = []
         for x in range(1, 19):
@@ -351,31 +358,31 @@ while running:
     if in_menu:
         pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
         text = big_font.render("SNAKE GAME", True, (255, 255, 255))
-        screen.blit(text, (280, 250))
+        screen.blit(text, text.get_rect(center=(WIDTH// 2, 250)))
         text2 = font.render("Press SPACE to start", True, (255, 255, 0))
-        screen.blit(text2, (370, 400))
+        screen.blit(text2,text2.get_rect(center =(WIDTH// 2, 400)))
         text3 = font.render("WASD or Arrow keys to move", True, (150, 150, 150))
-        screen.blit(text3, (340, 480))
+        screen.blit(text3, text3.get_rect(center =(WIDTH// 2, 480)))
         text4 = font.render("P to pause", True, (150, 150, 150))
-        screen.blit(text4, (420, 530))
+        screen.blit(text4, text4.get_rect(center =(WIDTH // 2, 530)))
         text5 = font.render("F11 to Fullscreen", True, (150, 150, 150))
-        screen.blit(text5, (385, 580))
+        screen.blit(text5, text5.get_rect(center = (WIDTH // 2, 580)))
         text6 = font.render(f"Difficulty (1, 2, 3): {difficulty}", True, (255, 255, 255))
-        screen.blit(text6, (100, 700))
+        screen.blit(text6, text6.get_rect(center = (WIDTH // 2, 700)))
     if game_over:
         pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
         text = death_font.render(death_title, True, (255, 80, 80))
-        screen.blit(text, (WIDTH // 2 - 150, HEIGHT // 2 - 80))
+        screen.blit(text, text.get_rect(center=(WIDTH // 2 , HEIGHT // 2 - 80)))
         text2 = font.render(death_insult, True, (255, 255, 255))
-        screen.blit(text2, (WIDTH // 2 - 150, HEIGHT // 2 + 10))
+        screen.blit(text2, text2.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 10)))
         text3 = font.render("Press ENTER to restart", True, (150, 150, 150))
-        screen.blit(text3, (WIDTH // 2 - 155, HEIGHT // 2 + 80))
+        screen.blit(text3, text3.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 80)))
     if paused:
         pygame.draw.rect(screen, (20, 30, 50), (0, 0, WIDTH, HEIGHT))
         text = big_font.render("PAUSED", True, (255, 255, 255))
-        screen.blit(text, (WIDTH // 2 - 155, HEIGHT // 2 - 80))
+        screen.blit(text, text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 80)))
         text2 = font.render("Press P to resume", True, (150, 150, 150))
-        screen.blit(text2, (WIDTH // 2 - 130, HEIGHT // 2 + 30))
+        screen.blit(text2, text2.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 30)))
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()
