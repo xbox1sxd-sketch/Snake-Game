@@ -1,4 +1,3 @@
-import os
 import random
 
 import pygame
@@ -146,8 +145,12 @@ def draw_ghost():
         x = ghost_pos[0] * CELL + OFFSET
         y = ghost_pos[1] * CELL + OFFSET
         pygame.draw.rect(screen, (200, 100, 255), (x, y, CELL, CELL ))
-    if pygame.time.get_ticks() < ghost_timer:
-        time_left = int((ghost_timer - pygame.time.get_ticks()) /1000) + 1
+    if paused:
+        current_time = pause_start_time
+    else:
+        current_time = pygame.time.get_ticks()
+    if current_time < ghost_timer:
+        time_left = int((ghost_timer - current_time) /1000) + 1
         ghost_text = ghost_font.render(f"GHOST: {time_left}s", True, (200, 100, 255))
         screen.blit(ghost_text, (WIDTH - 250, 60))
 
@@ -156,8 +159,12 @@ def draw_ultimate():
         x = ultimate_pos[0] * CELL + OFFSET
         y = ultimate_pos[1] * CELL + OFFSET
         pygame.draw.rect(screen, (255, 215, 0), (x, y, CELL, CELL ))
-    if pygame.time.get_ticks() < ultimate_timer:
-        time_left = int((ultimate_timer - pygame.time.get_ticks())/ 1000) + 1
+    if paused:
+        current_time = pause_start_time
+    else:
+        current_time = pygame.time.get_ticks()
+    if current_time < ultimate_timer:
+        time_left = int((ultimate_timer - current_time)/ 1000) + 1
         ultimate_text = ghost_font.render(f"ULTIMATE POWERUP: {time_left}s", True, (255, 215, 0))
         screen.blit(ultimate_text, (WIDTH - 250, 110))
 
@@ -257,13 +264,10 @@ def end_game():
 #If it finds highscore.txt if reads the number, and if there isnt a number it just returns zero
 #Used ai for this function
 def load_highscore():
-    if os.path.exists("highscore.txt"):
+    try:
         with open("highscore.txt", "r") as f:
-            try:
                 return int(f.read())
-            except ValueError:
-                return 0
-    else:
+    except:  # noqa: E722
         return 0
 
 #Opens the highscore file and writes the new number into it
@@ -357,7 +361,8 @@ while running:
     current_time = pygame.time.get_ticks()
     if not in_menu and not game_over and not paused and current_time - last_move_time >= move_delay:
         move_snake()
-        can_change_direction = True
+        if not game_over:
+            can_change_direction = True
         last_move_time = current_time
     if ghost_pos[0] == -1 and pygame.time.get_ticks() > ghost_spawn_time and not in_menu and not game_over and not paused:
         available = []
