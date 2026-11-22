@@ -153,18 +153,21 @@ def draw_wall():
 
 #Finds a good place to spawn the food, using a while true loop to keep picking random grid spots
 def spawn_food():
-    while True:
-        position = [random.randint(1, 18), random.randint(1, 13)]
-        in_pillar = False
-        for p in pillars:
-            if p[0] == position[0] and p[1] == position[1]:
-                in_pillar = True
-        in_snake = False
-        for s in snake:
-            if s[0] == position[0] and s[1] == position[1]:
-                in_snake = True
-        if in_pillar == False and in_snake == False and position != ghost_pos:
-            return position
+    available = []
+    for x in range(1, 19):
+        for y in range(1, 14):
+            pos = [x, y]
+            bad = False
+            if pos == ghost_pos:
+                bad = True
+            for s in snake:
+                if s[:2] == pos:
+                    bad = True
+            if bad == False:
+                available.append(pos)
+    if len(available) > 0:
+        return random.choice(available)
+    return [1, 1]
 food = spawn_food()
 food_color = random.choice(FOOD_COLORS)
 
@@ -245,7 +248,7 @@ def save_highscore(hs):
     try:
         with open("highscore.txt", "w") as f:
             f.write(str(hs))
-    except:
+    except:  # noqa: E722, S110
         pass
         
 highscore = load_highscore()
