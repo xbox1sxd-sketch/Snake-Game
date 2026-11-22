@@ -318,23 +318,23 @@ while running:
 
     move_delay = max(move_delay, 60)
     if ghost_pos[0] == -1 and pygame.time.get_ticks() > ghost_spawn_time and not in_menu and not game_over and not paused:
-        bad_spot = True
-        while bad_spot:
-            ghost_pos = [random.randint(1, 18), random.randint(1, 13)]
-            bad_spot = False
-            if ghost_pos == food:
-                bad_spot = True
-            for s in snake:
-                if s[:2] == ghost_pos:
-                    bad_spot = True
-            for p in pillars:
-                if p == ghost_pos:
-                    bad_spot = True
-    current_time = pygame.time.get_ticks()
-    if not in_menu and not game_over and not paused and current_time - last_move_time >= move_delay:
-        move_snake()
-        can_change_direction = True
-        last_move_time = current_time                 
+        available = []
+        for x in range(1, 19):
+            for y in range(1, 14):
+                pos = [x, y]
+                bad = False   
+                if pos == food:
+                    bad = True
+                for s in snake:
+                    if s[:2] == pos:
+                        bad = True
+                for p in pillars:
+                    if p == pos:
+                        bad = True
+                if bad == False:
+                    available.append(pos)
+        if len(available) > 0:
+            ghost_pos = random.choice(available)     
     draw_checkerboard()
     draw_snake()
     draw_food()
