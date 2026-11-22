@@ -33,6 +33,9 @@ death_font = pygame.Font(None, 55)
 can_change_direction = True
 ghost_pos = [-1, -1]
 ghost_timer = 0
+ultimate_pos = [-1, -1]
+ultimate_timer = 0
+ultimate_spawn_time = pygame.time.get_ticks() + random.randint(60000, 120000)
 ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
 ghost_font = pygame.Font(None, 30)
 pause_start_time = 0
@@ -148,6 +151,16 @@ def draw_ghost():
         ghost_text = ghost_font.render(f"GHOST: {time_left}s", True, (200, 100, 255))
         screen.blit(ghost_text, (WIDTH - 250, 60))
 
+def draw_ultimate():
+    if ultimate_pos[0] != -1:
+        x = ultimate_pos[0] * CELL + OFFSET
+        y = ultimate_pos[1] * CELL + OFFSET
+        pygame.draw.rect(screen, (255, 215, 0), (x, y, CELL, CELL ))
+    if pygame.time.get_ticks() < ultimate_timer:
+        time_left = int((ultimate_timer - pygame.time.get_ticks())/ 1000) + 1
+        ultimate_text = ghost_font.render(f"ULTIMATE POWERUP: {time_left}s", True, (255, 215, 0))
+        screen.blit(ultimate_text, (WIDTH - 250, 110))
+
 #Draws a border around the screen
 def draw_wall():
     pygame.draw.rect(screen, WALL_COLOR, (0, 0, WIDTH, HEIGHT), 12)
@@ -160,6 +173,8 @@ def spawn_food():
             pos = [x, y]
             bad = False
             if pos == ghost_pos:
+                bad = True
+            if pos == ultimate_pos:
                 bad = True
             for s in snake:
                 if s[:2] == pos:
@@ -182,7 +197,7 @@ def draw_pillars():
     
 #The biggest one, calculates where the head will be, if it hits something, if it eats something, and if we got a powerup
 def move_snake():
-    global food, game_over, direction, next_direction, food_color, score, highscore, death_title, death_insult, ghost_pos, ghost_timer, ghost_spawn_time  # noqa: PLW0602
+    global food, game_over, direction, next_direction, food_color, score, highscore, death_title, death_insult, ghost_pos, ghost_timer, ghost_spawn_time, ultimate_pos, ultimate_timer, ultimate_spawn_time  # noqa: PLW0602
     direction = next_direction
     head = snake[0]
     new_head = [head[0] + direction[0], head[1] + direction[1], SNAKE_COLOR]
@@ -190,7 +205,7 @@ def move_snake():
         end_game()
         return
     for p in pillars:
-        if new_head[0] == p[0] and new_head[1] == p[1] and pygame.time.get_ticks() >= ghost_timer:
+        if new_head[0] == p[0] and new_head[1] == p[1] and pygame.time.get_ticks() >= ghost_timer and pygame.time.get_ticks() >= ultimate_timer:
             end_game()        
             return
     ate_food = new_head[:2] == food
@@ -202,7 +217,7 @@ def move_snake():
     for s in body_to_check:
         if s[0] == new_head[0] and s[1] == new_head[1]:
             hit_self = True
-    if hit_self:
+    if hit_self and pygame.time.get_ticks() >= ultimate_timer:
         end_game()     
         return
 
@@ -211,13 +226,17 @@ def move_snake():
         new_head[2] = food_color
         food = spawn_food()
         food_color = random.choice(FOOD_COLORS)
-        score += 1
+        score += 1 
     else:
         snake.pop()
     if new_head[0] == ghost_pos[0] and new_head[1] == ghost_pos[1]:
         ghost_timer = pygame.time.get_ticks() + 5000
         ghost_pos = [-1, -1]
         ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
+    if new_head[0] == ultimate_pos[0] and new_head[1] == ultimate_pos[1]:
+        ultimate_timer = pygame.time.get_ticks() + 5000
+        ultimate_pos = [-1, -1]
+        ultimate_spawn_time = pygame.time.get_ticks() + random.randint(60000, 120000)
 
 # Draws the text in the top left and right. Also uses offset to make sure it doesnt hit the wall.
 def draw_score():
@@ -297,6 +316,9 @@ while running:
                 food = spawn_food()
                 food_color = random.choice(FOOD_COLORS)
                 ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
+                ultimate_pos = [-1, -1]
+                ultimate_timer = 0
+                ultimate_spawn_time = pygame.time.get_ticks() + random.randint(60000, 120000)
             if event.key == pygame.K_p and not in_menu and not game_over:
                 if paused == False:
                     paused = True
@@ -308,6 +330,9 @@ while running:
                         ghost_timer = ghost_timer + pause_duration
                     ghost_spawn_time = ghost_spawn_time + pause_duration
                     last_move_time = pygame.time.get_ticks()
+                    if ultimate_timer > pause_start_time:
+                        ultimate_timer = ultimate_timer + pause_duration
+                    ultimate_spawn_time = ultimate_spawn_time + pause_duration
             if (event.key == pygame.K_r or event.key == pygame.K_RETURN or event.key == pygame.K_SPACE) and game_over:
                 game_over = False
                 snake = [[5,5, SNAKE_COLOR ], [4, 5, SNAKE_COLOR], [3, 5, SNAKE_COLOR]]
@@ -322,9 +347,13 @@ while running:
                 ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
                 food = spawn_food()
                 food_color = random.choice(FOOD_COLORS)
+                ultimate_pos = [-1, -1]
+                ultimate_timer = 0
+                ultimate_spawn_time = pygame.time.get_ticks() + random.randint(60000, 120000)
     move_delay = base_speed - (len(snake) * 2)
-
-    move_delay = max(move_delay, 60)
+    if pygame.time.get_ticks() < ultimate_timer:
+        move_delay = move_delay - 40
+    move_delay = max(move_delay, 20)
     current_time = pygame.time.get_ticks()
     if not in_menu and not game_over and not paused and current_time - last_move_time >= move_delay:
         move_snake()
@@ -338,6 +367,8 @@ while running:
                 bad = False   
                 if pos == food:
                     bad = True
+                if pos == ultimate_pos:
+                    bad = True
                 for s in snake:
                     if s[:2] == pos:
                         bad = True
@@ -348,10 +379,31 @@ while running:
                     available.append(pos)
         if len(available) > 0:
             ghost_pos = random.choice(available)     
+    if ultimate_pos[0] == -1 and pygame.time.get_ticks() > ultimate_spawn_time and not in_menu and not game_over and not paused:
+        available = []
+        for x in range(1, 19):
+            for y in range(1, 14):
+                pos = [x, y]
+                bad = False
+                if pos == food:
+                    bad = True
+                if pos == ghost_pos:
+                    bad = True
+                for s in snake:
+                    if s[:2] == pos:
+                        bad = True
+                for p in pillars:
+                    if p == pos:
+                        bad = True
+                if bad == False:
+                    available.append(pos)
+        if len(available) > 0:
+            ultimate_pos = random.choice(available)
     draw_checkerboard()
     draw_snake()
     draw_food()
     draw_ghost()
+    draw_ultimate()
     draw_pillars()
     draw_wall()
     draw_score()
@@ -365,8 +417,6 @@ while running:
         screen.blit(text3, text3.get_rect(center =(WIDTH// 2, 480)))
         text4 = font.render("P to pause", True, (150, 150, 150))
         screen.blit(text4, text4.get_rect(center =(WIDTH // 2, 530)))
-        text5 = font.render("F11 to Fullscreen", True, (150, 150, 150))
-        screen.blit(text5, text5.get_rect(center = (WIDTH // 2, 580)))
         text6 = font.render(f"Difficulty (1, 2, 3): {difficulty}", True, (255, 255, 255))
         screen.blit(text6, text6.get_rect(center = (WIDTH // 2, 700)))
     if game_over:
