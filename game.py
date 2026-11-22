@@ -27,7 +27,6 @@ HEAD_COLOR = (0,255,200)
 snake = [[5,5, SNAKE_COLOR], [4,5, SNAKE_COLOR], [3, 5, SNAKE_COLOR]]
 direction = [1,0]
 next_direction = [1,0]
-is_fullscreen = False
 last_move_time = 0
 highscore = 0
 death_font = pygame.Font(None, 55)
@@ -162,6 +161,9 @@ def spawn_food():
                 bad = True
             for s in snake:
                 if s[:2] == pos:
+                    bad = True
+            for p in pillars:
+                if p == pos:
                     bad = True
             if bad == False:
                 available.append(pos)
@@ -303,9 +305,6 @@ while running:
                         ghost_timer = ghost_timer + pause_duration
                     ghost_spawn_time = ghost_spawn_time + pause_duration
                     last_move_time = pygame.time.get_ticks()
-            if event.key == pygame.K_F11:
-                pygame.display.toggle_fullscreen()
-                is_fullscreen = not is_fullscreen
             if (event.key == pygame.K_r or event.key == pygame.K_RETURN or event.key == pygame.K_SPACE) and game_over:
                 game_over = False
                 snake = [[5,5, SNAKE_COLOR ], [4, 5, SNAKE_COLOR], [3, 5, SNAKE_COLOR]]
