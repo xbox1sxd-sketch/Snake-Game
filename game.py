@@ -230,6 +230,15 @@ def draw_score():
     hs_text = font.render(f"High Score: {highscore}", True, (255, 215, 0))
     screen.blit(hs_text, (WIDTH - 250 - OFFSET, 15 + OFFSET))
 
+def end_game():
+    global game_over, highscore, death_title, death_insult
+    game_over = True
+    if score > highscore:
+        highscore = score
+        save_highscore(highscore)
+    death_title = random.choice(oops_messages)
+    death_insult = random.choice(insult_messages)
+
 #If it finds highscore.txt if reads the number, and if there isnt a number it just returns zero
 #Used ai for this function
 def load_highscore():
@@ -309,7 +318,6 @@ while running:
                 next_direction = [1,0]
                 score = 0
                 can_change_direction = True
-                next_direction = [1, 0]
                 last_move_time = pygame.time.get_ticks()
                 make_pillars()
                 ghost_pos = [-1, -1]
