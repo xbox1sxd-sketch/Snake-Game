@@ -135,9 +135,10 @@ def draw_snake():
                     
 #Draws a square with whatever is stored in food_color
 def draw_food():
-    x = food[0] * CELL + OFFSET
-    y = food[1] * CELL + OFFSET
-    pygame.draw.rect(screen, food_color, (x, y, CELL, CELL))
+    if food is not None:
+        x = food[0] * CELL + OFFSET
+        y = food[1] * CELL + OFFSET
+        pygame.draw.rect(screen, food_color, (x, y, CELL, CELL))
        
 #If the ghost powerup is on the board it draws a square, and if the ghost timer is active it calculated how many seconds are left.     
 def draw_ghost():
@@ -172,30 +173,36 @@ def draw_ultimate():
 def draw_wall():
     pygame.draw.rect(screen, WALL_COLOR, (0, 0, WIDTH, HEIGHT), 12)
 
-#Finds a good place to spawn the food, using a while true loop to keep picking random grid spots
-def spawn_food():
-    available = []
+def get_free_cells(ignore = None):
+    free_cells = []
     for x in range(1, 19):
         for y in range(1, 14):
-            pos = [x, y]
-            bad = False
-            if pos == ghost_pos:
-                bad = True
-            if pos == ultimate_pos:
-                bad = True
-            for s in snake:
-                if s[:2] == pos:
-                    bad = True
-            for p in pillars:
-                if p == pos:
-                    bad = True
-            if bad == False:
-                available.append(pos)
+            spot = [x, y]
+            if spot not in [s[:2] for s in snake] and spot not in pillars:  # noqa: SIM102
+                if spot != ghost_pos and spot != ultimate_pos and spot != ignore:
+                    free_cells.append(spot)
+    return free_cells
+
+#Finds a good place to spawn the food, using a while true loop to keep picking random grid spots
+def spawn_food():
+    available = get_free_cells()
     if len(available) > 0:
         return random.choice(available)
-    return [1, 1]
+    return None
 food = spawn_food()
 food_color = random.choice(FOOD_COLORS)
+
+def spawn_ghost():
+    available = get_free_cells(ignore = food)
+    if len(available) > 0:
+        return random.choice(available)
+    return None
+
+def spawn_ultimate():
+    available = get_free_cells(ignore = food)
+    if len(available) > 0:
+        return random.choice(available)
+    return None
 
 #Loops through the pillars list and draws a black square at each position
 def draw_pillars():
@@ -365,52 +372,21 @@ while running:
             can_change_direction = True
         last_move_time = current_time
     if ghost_pos[0] == -1 and pygame.time.get_ticks() > ghost_spawn_time and not in_menu and not game_over and not paused:
-        available = []
-        for x in range(1, 19):
-            for y in range(1, 14):
-                pos = [x, y]
-                bad = False   
-                if pos == food:
-                    bad = True
-                if pos == ultimate_pos:
-                    bad = True
-                for s in snake:
-                    if s[:2] == pos:
-                        bad = True
-                for p in pillars:
-                    if p == pos:
-                        bad = True
-                if bad == False:
-                    available.append(pos)
-        if len(available) > 0:
-            ghost_pos = random.choice(available)     
+        new_ghost = spawn_ghost()
+        if new_ghost is not None:
+            ghost_pos = new_ghost 
     if ultimate_pos[0] == -1 and pygame.time.get_ticks() > ultimate_spawn_time and not in_menu and not game_over and not paused:
-        available = []
-        for x in range(1, 19):
-            for y in range(1, 14):
-                pos = [x, y]
-                bad = False
-                if pos == food:
-                    bad = True
-                if pos == ghost_pos:
-                    bad = True
-                for s in snake:
-                    if s[:2] == pos:
-                        bad = True
-                for p in pillars:
-                    if p == pos:
-                        bad = True
-                if bad == False:
-                    available.append(pos)
-        if len(available) > 0:
-            ultimate_pos = random.choice(available)
+        new_ultimate = spawn_ultimate()
+        if new_ultimate is not None:
+            ultimate_pos = new_ultimate
     draw_checkerboard()
-    draw_snake()
+    draw_pillars()
     draw_food()
     draw_ghost()
+    draw_snake()
+    draw_ghost()
     draw_ultimate()
-    draw_pillars()
-    draw_wall()
+    draw_wall
     draw_score()
     if in_menu:
         pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
