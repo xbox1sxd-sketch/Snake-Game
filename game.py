@@ -17,7 +17,7 @@ in_menu = True
 big_font = pygame.Font(None, 100)
 game_over = False
 paused = False
-screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED)
+screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED | pygame.RESIZABLE)
 clock = pygame.time.Clock()
 font = pygame.Font(None, 40)
 LIGHT = (60, 120, 80)
@@ -180,34 +180,18 @@ def move_snake():
     head = snake[0]
     new_head = [head[0] + direction[0], head[1] + direction[1], SNAKE_COLOR]
     if new_head[0] < 0 or new_head[0] >= 20 or new_head[1] < 0 or new_head[1] >= 15:
-        game_over = True
-        if score > highscore:
-            highscore = score
-            save_highscore(highscore)
-        death_title = random.choice(oops_messages)
-        death_insult = random.choice(insult_messages)
+        end_game()
         return
     for p in pillars:
         if new_head[0] == p[0] and new_head[1] == p[1] and pygame.time.get_ticks() >= ghost_timer:
-            game_over = True
-            if score > highscore:
-                highscore = score
-                save_highscore(highscore)
-            death_title = random.choice(oops_messages)
-            death_insult = random.choice(insult_messages)           
+            end_game()        
             return
     hit_self = False
     for s in snake[:-1]:
         if s[0] == new_head[0] and s[1] == new_head[1]:
             hit_self = True
     if hit_self:
-        game_over = True
-        if score > highscore:
-            highscore = score
-            save_highscore(highscore)
-        death_title = random.choice(oops_messages)
-        death_insult = random.choice(insult_messages)       
-        
+        end_game()     
         return
     ate_food = new_head[:2] == food
     snake.insert(0, new_head)
@@ -326,8 +310,7 @@ while running:
                 food = spawn_food()
                 food_color = random.choice(FOOD_COLORS)
     move_delay = base_speed - (len(snake) * 2)
-    if is_fullscreen == True:
-        move_delay = move_delay - 15
+
     move_delay = max(move_delay, 60)
     if ghost_pos[0] == -1 and pygame.time.get_ticks() > ghost_spawn_time and not in_menu and not game_over and not paused:
         bad_spot = True
