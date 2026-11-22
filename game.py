@@ -186,14 +186,19 @@ def move_snake():
         if new_head[0] == p[0] and new_head[1] == p[1] and pygame.time.get_ticks() >= ghost_timer:
             end_game()        
             return
+    ate_food = new_head[:2] == food
+    if ate_food:
+        body_to_check = snake
+    else:
+        body_to_check = snake[:-1]
     hit_self = False
-    for s in snake[:-1]:
+    for s in body_to_check:
         if s[0] == new_head[0] and s[1] == new_head[1]:
             hit_self = True
     if hit_self:
         end_game()     
         return
-    ate_food = new_head[:2] == food
+
     snake.insert(0, new_head)
     if ate_food:
         new_head[2] = food_color
