@@ -242,8 +242,11 @@ def load_highscore():
 
 #Opens the highscore file and writes the new number into it
 def save_highscore(hs):
-    with open("highscore.txt", "w") as f:
-        f.write(str(hs))
+    try:
+        with open("highscore.txt", "w") as f:
+            f.write(str(hs))
+    except:
+        pass
         
 highscore = load_highscore()
 
