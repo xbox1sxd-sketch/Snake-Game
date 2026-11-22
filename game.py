@@ -294,6 +294,7 @@ while running:
                 make_pillars()
                 food = spawn_food()
                 food_color = random.choice(FOOD_COLORS)
+                ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
             if event.key == pygame.K_p and not in_menu and not game_over:
                 if paused == False:
                     paused = True
