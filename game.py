@@ -37,6 +37,9 @@ ultimate_timer = 0
 ultimate_spawn_time = pygame.time.get_ticks() + random.randint(60000, 120000)
 ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
 ghost_font = pygame.Font(None, 30)
+double_points_pos = [-1, -1]
+double_points_timer = 0
+double_points_spawn_time = pygame.time.get_ticks() + random.randint(45000, 75000)
 pause_start_time = 0
 
 oops_messages = [
@@ -169,6 +172,20 @@ def draw_ultimate():
         ultimate_text = ghost_font.render(f"ULTIMATE POWERUP: {time_left}s", True, (255, 215, 0))
         screen.blit(ultimate_text, (WIDTH - 250, 110))
 
+def draw_double_point():
+    if double_points_pos[0] != -1:
+        x = double_points_pos[0] * CELL + OFFSET
+        y = double_points_pos[1] * CELL + OFFSET
+        pygame.draw.rect(screen, (255, 80, 180), (x, y, CELL, CELL))
+    if paused:
+        current_time = pause_start_time
+    else:
+        current_time = pygame.time.get_ticks()
+    if current_time < double_points_timer:
+        time_left = int((double_points_timer - current_time)/ 1000) + 1
+        double_text = ghost_font.render(f"DOUBLE POINTS:{time_left}s", True, (255, 80, 100))
+        screen.blit(double_text, (WIDTH - double_text.get_width() - 20, 160))
+
 #Draws a border around the screen
 def draw_wall():
     pygame.draw.rect(screen, WALL_COLOR, (0, 0, WIDTH, HEIGHT), 12)
@@ -179,7 +196,7 @@ def get_free_cells(ignore = None):
         for y in range(1, 14):
             spot = [x, y]
             if spot not in [s[:2] for s in snake] and spot not in pillars:  # noqa: SIM102
-                if spot != ghost_pos and spot != ultimate_pos and spot != ignore:
+                if spot != ghost_pos and spot != ultimate_pos and spot != double_points_pos and spot != ignore:
                     free_cells.append(spot)
     return free_cells
 
@@ -204,6 +221,12 @@ def spawn_ultimate():
         return random.choice(available)
     return None
 
+def spawn_double_points():
+    available = get_free_cells(ignore = food)
+    if len(available) > 0:
+        return random.choice(available)
+    return None
+
 #Loops through the pillars list and draws a black square at each position
 def draw_pillars():
     for p in pillars:
@@ -211,7 +234,7 @@ def draw_pillars():
     
 #The biggest one, calculates where the head will be, if it hits something, if it eats something, and if we got a powerup
 def move_snake():
-    global food, game_over, direction, next_direction, food_color, score, highscore, death_title, death_insult, ghost_pos, ghost_timer, ghost_spawn_time, ultimate_pos, ultimate_timer, ultimate_spawn_time  # noqa: PLW0602
+    global food, game_over, direction, next_direction, food_color, score, highscore, death_title, death_insult, ghost_pos, ghost_timer, ghost_spawn_time, ultimate_pos, ultimate_timer, ultimate_spawn_time, double_points_pos, double_points_timer, double_points_spawn_time  # noqa: PLW0602
     direction = next_direction
     head = snake[0]
     new_head = [head[0] + direction[0], head[1] + direction[1], SNAKE_COLOR]
@@ -240,7 +263,10 @@ def move_snake():
         new_head[2] = food_color
         food = spawn_food()
         food_color = random.choice(FOOD_COLORS)
-        score += 1 
+        if pygame.time.get_ticks() < double_points_timer:
+            score += 2
+        else:
+            score += 1
     else:
         snake.pop()
     if new_head[0] == ghost_pos[0] and new_head[1] == ghost_pos[1]:
@@ -248,9 +274,13 @@ def move_snake():
         ghost_pos = [-1, -1]
         ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
     if new_head[0] == ultimate_pos[0] and new_head[1] == ultimate_pos[1]:
-        ultimate_timer = pygame.time.get_ticks() + 5000
+        ultimate_timer = pygame.time.get_ticks() + 20000
         ultimate_pos = [-1, -1]
         ultimate_spawn_time = pygame.time.get_ticks() + random.randint(60000, 120000)
+    if new_head[0] == double_points_pos[0] and new_head[1] == double_points_pos[1]:
+        double_points_timer = pygame.time.get_ticks() + 10000
+        double_points_pos = [-1, -1]
+        double_points_spawn_time = pygame.time.get_ticks() + random.randint(60000, 75000)
 
 # Draws the text in the top left and right. Also uses offset to make sure it doesnt hit the wall.
 def draw_score():
@@ -324,6 +354,9 @@ while running:
                 last_move_time = pygame.time.get_ticks()
                 can_change_direction = True
                 make_pillars()
+                double_points_pos = [-1, -1]
+                double_points_timer = 0
+                double_points_spawn_time = pygame.time.get_ticks() + random.randint(45000, 75000)
                 food = spawn_food()
                 food_color = random.choice(FOOD_COLORS)
                 ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
@@ -344,6 +377,9 @@ while running:
                     if ultimate_timer > pause_start_time:
                         ultimate_timer = ultimate_timer + pause_duration
                     ultimate_spawn_time = ultimate_spawn_time + pause_duration
+                    if double_points_timer > pause_start_time:
+                        double_points_timer = double_points_timer + pause_duration
+                    double_points_spawn_time = double_points_spawn_time + pause_duration
             if (event.key == pygame.K_r or event.key == pygame.K_RETURN or event.key == pygame.K_SPACE) and game_over:
                 game_over = False
                 snake = [[5,5, SNAKE_COLOR ], [4, 5, SNAKE_COLOR], [3, 5, SNAKE_COLOR]]
@@ -353,6 +389,9 @@ while running:
                 can_change_direction = True
                 last_move_time = pygame.time.get_ticks()
                 make_pillars()
+                double_points_pos = [-1, -1]
+                double_points_timer = 0
+                double_points_spawn_time = pygame.time.get_ticks() + random.randint(45000, 75000)
                 ghost_pos = [-1, -1]
                 ghost_timer = 0
                 ghost_spawn_time = pygame.time.get_ticks() + random.randint(20000, 45000)
@@ -379,14 +418,18 @@ while running:
         new_ultimate = spawn_ultimate()
         if new_ultimate is not None:
             ultimate_pos = new_ultimate
+    if double_points_pos[0] == -1 and pygame.time.get_ticks() > double_points_spawn_time and not in_menu and not game_over and not paused:
+        new_double_points = spawn_double_points()
+        if new_double_points is not None:
+            double_points_pos = new_double_points
     draw_checkerboard()
     draw_pillars()
     draw_food()
-    draw_ghost()
     draw_snake()
     draw_ghost()
     draw_ultimate()
-    draw_wall
+    draw_double_point()
+    draw_wall()
     draw_score()
     if in_menu:
         pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
